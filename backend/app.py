@@ -14,17 +14,27 @@ from urllib.parse import urlparse
 import numpy as np
 import requests
 import random
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, jsonify, request, send_from_directory
 from flask_cors import CORS
+from dotenv import load_dotenv
 from ml_pipeline import pipeline
 from firebase_sync import firebase_manager
 from cloudinary_manager import cloudinary_manager
 from waitress import serve
 
-app = Flask(__name__)
+# Load environment variables
+load_dotenv()
+
+# Initialize Flask to serve frontend static files from the project root
+app = Flask(__name__, static_folder='../', static_url_path='/')
 
 # Complete CORS Configuration
+allowed_origins = ["http://localhost:8000", "http://localhost:5000", "http://127.0.0.1:8000", "http://127.0.0.1:5000", r"https://.*\.onrender\.com", r"https://.*\.netlify\.app"]
 CORS(app, resources={r"/*": {"origins": "*"}}, allow_headers=["Content-Type", "Authorization"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'web/index.html')
 
 import traceback
 
@@ -89,9 +99,8 @@ def api_health():
     return jsonify({
         "status": "online",
         "backend": "running",
-        "camera": cam_connected,
-        "firebase": fb_connected,
-        "cloudinary": cld_connected,
+        "firebase": "connected" if fb_connected == "connected" else "disconnected",
+        "cloudinary": "connected" if cld_connected == "connected" else "disconnected",
         "model": model_state
     }), 200
 camera_is_alive = True
@@ -971,9 +980,7 @@ def api_recognize():
         response['logs'] = logs
     return jsonify(response)
 
-@app.route('/')
-def root():
-    return jsonify({"server": "online", "system": "NEXUS-AI Face Recognition API"})
+
 
 @app.route('/video_feed')
 def video_feed():
@@ -1018,5 +1025,6 @@ def set_camera():
     })
 
 if __name__ == '__main__':
-    print("[NEXUS-AI Production Server] Serving on http://127.0.0.1:5000 with Waitress WSGI ...")
-    serve(app, host='0.0.0.0', port=5000, threads=16)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"[NEXUS-AI Production Server] Serving on http://0.0.0.0:{port} with Waitress WSGI ...")
+    serve(app, host='0.0.0.0', port=port, threads=16)

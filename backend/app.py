@@ -1,6 +1,9 @@
 import os
 import sys
 
+# Ensure the backend directory is in the path for relative imports when running via gunicorn backend.app:app
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
 os.environ["OPENCV_LOG_LEVEL"] = "ERROR"
 

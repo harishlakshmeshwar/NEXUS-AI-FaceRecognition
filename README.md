@@ -52,7 +52,7 @@ This project is perfectly configured to be deployed as a single Web Service on R
 2. Connect your GitHub repository.
 3. Render will automatically detect the settings from `render.yaml`.
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn --chdir backend app:app`
+   - **Start Command**: `gunicorn backend.app:app`
 4. Add your Environment Variables under the "Environment" tab (see below).
 5. Click **Deploy**. Your app will automatically build and start serving!
 

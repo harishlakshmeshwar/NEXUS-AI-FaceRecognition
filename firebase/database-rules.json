@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "recognition_events": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["timestamp", "confidence"]
+    },
+    "users": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
